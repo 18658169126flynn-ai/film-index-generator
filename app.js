@@ -3409,6 +3409,8 @@ html, body { margin: 0; padding: 0; background: #ffffff; }
         : Math.max(1, slotCount - 1);
     const sheetPad = Math.round(baseFrameW * 0.18);
     const rowGap = Math.round(baseFrameW * 0.14);
+    // 每个片边编号覆盖的格数：半格每号跨两格（38mm 片距），其余一格一号
+    const edgeMarkSpan = isCroppedHalfFrame ? 2 : 1;
 
     return {
       frameW: baseFrameW,
@@ -3425,8 +3427,10 @@ html, body { margin: 0; padding: 0; background: #ffffff; }
       leaderCapacity,
       frameAreaW,
       edgeMarkW: baseFrameW,
-      edgeMarkGap: is120 ? normalGap : Math.max(0, pxPerMm135 * FILM_135.frameAdvanceMm - baseFrameW),
-      edgeMarkSlotSpan: isCroppedHalfFrame ? 2 : 1,
+      // 标记间距必须是槽间距的整数倍：间距不同值取整时，行首编号会被
+      // floor(start × slotPitch / markPitch) 折回上一行末号，出现重复编号
+      edgeMarkGap: edgeMarkSpan * slotGap,
+      edgeMarkSlotSpan: edgeMarkSpan,
       isHalfFrame,
       isCroppedHalfFrame,
       isWide135,
@@ -3527,6 +3531,8 @@ html, body { margin: 0; padding: 0; background: #ffffff; }
         : Math.max(1, columns - 1);
 
     const previewPxPerMm = clamp(Number(frameWidthInput.value) || 420, 180, 1200) / 36;
+    // 每个片边编号覆盖的格数：半格每号跨两格（38mm 片距），其余一格一号
+    const edgeMarkSpan = isCroppedHalfFrame ? 2 : 1;
 
     return {
       frameW: anchorW,
@@ -3543,8 +3549,8 @@ html, body { margin: 0; padding: 0; background: #ffffff; }
       leaderCapacity,
       frameAreaW,
       edgeMarkW: anchorW,
-      edgeMarkGap: is120 ? normalGap : slotGap,
-      edgeMarkSlotSpan: isCroppedHalfFrame ? 2 : 1,
+      edgeMarkGap: edgeMarkSpan * slotGap,
+      edgeMarkSlotSpan: edgeMarkSpan,
       isHalfFrame,
       isCroppedHalfFrame,
       isWide135,

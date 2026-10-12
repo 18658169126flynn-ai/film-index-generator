@@ -256,8 +256,12 @@
     const firstIndex = Number.isFinite(rowInfo.edgeMarkStartIndex)
       ? Math.max(0, Math.floor(rowInfo.edgeMarkStartIndex))
       : Math.floor((rowInfo.start * (options.slotW + options.slotGap)) / markPitch);
+    // 编号只排到本行实际印出的格位（含补白格），否则末号会画进右侧片边留白，
+    // 与下一行首号重复
+    const slotSpan = rowInfo.trimmed ? rowInfo.count : rowInfo.capacity;
+    const contentEndX = startX + slotSpan * (options.slotW + options.slotGap) - options.slotGap;
     const marks = [];
-    for (let markX = startX, index = firstIndex; markX < x + stripW; markX += markPitch, index += 1) {
+    for (let markX = startX, index = firstIndex; markX < Math.min(x + stripW, contentEndX); markX += markPitch, index += 1) {
       marks.push({ x: markX, index });
     }
     return marks;
