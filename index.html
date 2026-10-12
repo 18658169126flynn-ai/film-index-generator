@@ -33,7 +33,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" />
-    <link rel="stylesheet" href="styles.css?v=20260823-boot" />
+    <link rel="stylesheet" href="styles.css?v=20261012f-sidebar" />
   </head>
   <body>
     <main class="app-shell">
@@ -58,245 +58,274 @@
           </button>
         </div>
 
-        <details class="panel advanced-panel workflow-panel" id="sourcePanel" open>
-          <summary><h2>导入与整理</h2></summary>
-          <label class="drop-zone" id="dropZone">
-            <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" multiple />
-            <span class="drop-icon" aria-hidden="true">+</span>
-            <span class="drop-title">选择或拖入扫描件</span>
-            <span class="drop-subtitle">JPG / PNG / WebP，按本地文件处理</span>
-          </label>
-
-          <section class="panel-section" aria-label="排序">
-            <h3>排序</h3>
-            <div class="segmented segmented-3 sort-segmented" role="radiogroup" aria-label="排序方式">
-              <span class="segment-indicator" aria-hidden="true"></span>
-              <label>
-                <input type="radio" name="sortMode" value="name" checked />
-                <span>名称</span>
-              </label>
-              <label>
-                <input type="radio" name="sortMode" value="time" />
-                <span>时间</span>
-              </label>
-              <label>
-                <input type="radio" name="sortMode" value="custom" />
-                <span>自定义</span>
-              </label>
-            </div>
-            <label class="checkbox-row">
-              <input id="reverseSort" type="checkbox" />
-              <span>倒序</span>
-            </label>
-            <span class="info-icon-wrapper">
-              <span class="info-icon" aria-label="排序说明">i</span>
-              <span class="info-popup">时间排序优先使用 EXIF 拍摄时间，没有时退回文件修改时间。直接在预览图上拖动某一帧、或在照片列表中拖拽，都会切换为自定义排序。</span>
-            </span>
-          </section>
-
-          <details class="panel-section photo-list-section" id="photoListPanel" hidden>
+        <div class="steps">
+          <details class="step workflow-panel" id="stepSource" open>
             <summary>
-              <span>照片列表</span>
-              <span class="photo-list-count" id="photoListCount">0 张</span>
+              <span class="step-no" aria-hidden="true">01</span>
+              <span class="step-title">导入与排序</span>
+              <span class="chip" id="stepChipSource">未导入</span>
             </summary>
-            <div class="photo-list-content">
-              <ul class="photo-list" id="photoList"></ul>
-              <button id="clearButton" class="text-button" type="button">清空全部</button>
-            </div>
-          </details>
-        </details>
+            <div class="step-body">
+              <label class="drop-zone" id="dropZone">
+                <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" multiple />
+                <span class="drop-icon" aria-hidden="true">+</span>
+                <span class="drop-title">选择或拖入扫描件</span>
+                <span class="drop-subtitle">JPG / PNG / WebP，按本地文件处理</span>
+              </label>
 
-        <details class="panel advanced-panel workflow-panel" id="appearancePanel" open>
-          <summary><h2>胶片外观与输出</h2></summary>
-
-          <section class="panel-section" aria-label="胶卷型号">
-            <h3>胶卷型号</h3>
-            <label class="field stock-search-field">
-              <span>搜索胶卷型号</span>
-              <input
-                id="stockSearch"
-                type="search"
-                placeholder="名称、边字或冲洗工艺"
-                autocomplete="off"
-                spellcheck="false"
-                aria-controls="stockSelect"
-                aria-describedby="stockSearchStatus"
-              />
-            </label>
-            <p id="stockSearchStatus" class="field-hint stock-search-status" aria-live="polite"></p>
-            <label class="field">
-              <span>胶卷型号</span>
-              <select id="stockSelect"></select>
-            </label>
-          </section>
-
-          <section class="panel-section" aria-label="输出设置">
-            <h3>输出设置</h3>
-            <label class="field">
-              <span>画幅</span>
-              <select id="frameAspect">
-                <option value="135" selected>135 全画幅 3:2</option>
-                <option value="half">半格 3:4（每行 12 张）</option>
-                <option value="66">6×6 方画幅 1:1</option>
-                <option value="645">6×4.5 中画幅（竖幅）</option>
-                <option value="67">6×7 中画幅</option>
-                <option value="69">6×9 中画幅 84×56</option>
-                <option value="wide">135 宽幅</option>
-                <option value="xpan" hidden>XPan 135 宽幅 65×24（兼容）</option>
-                <option value="135-69" hidden>135 宽幅 84×24（兼容）</option>
-                <option value="612">6×12 宽幅中画幅</option>
-                <option value="617">6×17 宽幅中画幅</option>
-              </select>
-            </label>
-            <label class="field" id="wideSpecField" hidden>
-              <span>宽幅规格</span>
-              <select id="wideSpecSelect">
-                <option value="xpan">XPan 65×24mm（每行 3 张）</option>
-                <option value="135-69">84×24mm（6×9 相机，每行 2 张）</option>
-              </select>
-            </label>
-            <div class="field" id="halfFrameModeField" hidden>
-              <span>半格输入</span>
-              <div class="segmented" role="radiogroup" aria-label="半格输入方式">
-                <label>
-                  <input type="radio" name="halfFrameMode" value="cropped" checked />
-                  <span>单张裁切</span>
-                </label>
-                <label>
-                  <input type="radio" name="halfFrameMode" value="uncropped" />
-                  <span>单张未裁切</span>
-                </label>
+              <div class="field">
+                <span class="field-label"><span>排序方式</span></span>
+                <div class="segmented segmented-3 sort-segmented" role="radiogroup" aria-label="排序方式">
+                  <span class="segment-indicator" aria-hidden="true"></span>
+                  <label>
+                    <input type="radio" name="sortMode" value="name" checked />
+                    <span>名称</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="sortMode" value="time" />
+                    <span>时间</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="sortMode" value="custom" />
+                    <span>自定义</span>
+                  </label>
+                </div>
               </div>
-            </div>
-            <label class="field">
-              <span>每行张数</span>
-              <select id="columnsSelect">
-                <option value="2">2 张</option>
-                <option value="3">3 张</option>
-                <option value="4">4 张</option>
-                <option value="5">5 张</option>
-                <option value="6" selected>6 张</option>
-                <option value="7">7 张</option>
-                <option value="8">8 张</option>
-              </select>
-              <small id="columnsHint" class="field-hint" hidden></small>
-            </label>
-          </section>
 
-          <section class="panel-section" aria-label="胶片外观">
-            <h3>胶片外观</h3>
-            <label class="checkbox-row">
-              <input id="showEdgeText" type="checkbox" checked />
-              <span>模拟边字</span>
-            </label>
-            <label class="checkbox-row">
-              <input id="showSprockets" type="checkbox" checked />
-              <span>模拟齿孔</span>
-            </label>
-            <small id="sprocketsHint" class="field-hint" hidden></small>
-            <label class="checkbox-row">
-              <input id="imageInSprockets" type="checkbox" />
-              <span>成像覆盖齿孔区</span>
-            </label>
-            <label class="checkbox-row">
-              <input id="imageInEdgeText" type="checkbox" />
-              <span>成像覆盖边字区</span>
-            </label>
-            <small id="imageCoverageHint" class="field-hint" hidden></small>
-            <label class="checkbox-row">
-              <input id="showLeader" type="checkbox" checked />
-              <span>模拟片头片尾</span>
-            </label>
-            <small id="leaderHint" class="field-hint" hidden></small>
-            <label class="field background-style-field">
-              <span>背景样式</span>
-              <select id="backgroundStyle">
-                <option value="none" selected>无（淡黄纸底）</option>
-                <option value="white">纯白</option>
-                <option value="transparent">透明（导出 PNG）</option>
-                <option value="blur">高斯模糊</option>
-              </select>
-            </label>
-            <label class="checkbox-row">
-              <input id="showStripShadow" type="checkbox" checked />
-              <span>胶片条投影</span>
-            </label>
-            <label class="field background-blur-field" id="backgroundBlurField">
-              <span class="field-label-with-value">
-                <span>虚化强度</span>
-                <output id="backgroundBlurValue" for="backgroundBlur">24 px</output>
+              <label class="checkbox-row">
+                <input id="reverseSort" type="checkbox" />
+                <span>倒序</span>
+              </label>
+
+              <span class="info-icon-wrapper">
+                <span class="info-icon" aria-label="排序说明">i</span>
+                <span class="info-popup">时间排序优先使用 EXIF 拍摄时间，没有时退回文件修改时间。直接在预览图上拖动某一帧、或在照片列表中拖拽，都会切换为自定义排序。</span>
               </span>
-              <input id="backgroundBlur" type="range" min="8" max="64" step="2" value="24" aria-describedby="backgroundHint" />
-            </label>
-            <small id="backgroundHint" class="field-hint">默认使用首图；点击单帧可将其设为背景</small>
-          </section>
 
-        </details>
+              <details class="photo-list-section" id="photoListPanel" hidden>
+                <summary>
+                  <span>照片列表</span>
+                  <span class="photo-list-count" id="photoListCount">0 张</span>
+                </summary>
+                <div class="photo-list-content">
+                  <ul class="photo-list" id="photoList"></ul>
+                  <button id="clearButton" class="text-button" type="button">清空全部</button>
+                </div>
+              </details>
+            </div>
+          </details>
 
-        <details class="panel advanced-panel" id="stockPanel">
-          <summary><h2>自定义型号</h2></summary>
-          <p class="hint">
-            <span class="info-icon-wrapper">
-              <span class="info-icon" aria-label="说明">i</span>
-              <span class="info-popup">新增或编辑胶卷型号，保存在浏览器本地。选中内置型号时可另存为自定义型号后修改。</span>
-            </span>
-          </p>
-          <label class="field">
-            <span>名称</span>
-            <input id="stockName" type="text" placeholder="如 Kodak Vision3 250D" maxlength="60" />
-          </label>
-          <label class="field">
-            <span>边字字样（留空表示底片无边字）</span>
-            <input id="stockEdgeText" type="text" placeholder="如 KODAK VISION3 250D" maxlength="60" />
-          </label>
-          <label class="field">
-            <span>冲洗工艺</span>
-            <select id="stockProcess">
-              <option value="C-41" selected>C-41 彩色负片</option>
-              <option value="BW">黑白负片</option>
-              <option value="E-6">E-6 反转片</option>
-              <option value="ECN-2">ECN-2 电影卷</option>
-            </select>
-          </label>
-          <details class="stock-advanced" id="stockAdvanced">
-            <summary>高级外观（默认随工艺）</summary>
-            <label class="checkbox-row">
-              <input id="stockInkEnabled" type="checkbox" />
-              <span>自定义边字颜色</span>
-            </label>
-            <label class="field stock-ink-field" id="stockInkField">
-              <span>边字颜色</span>
-              <input id="stockInkColor" type="color" value="#ffb040" />
+          <details class="step workflow-panel" id="stepStock" open>
+            <summary>
+              <span class="step-no" aria-hidden="true">02</span>
+              <span class="step-title">胶卷型号</span>
+              <span class="chip" id="stepChipStock">—</span>
+            </summary>
+            <div class="step-body">
+              <label class="field stock-search-field">
+                <span>搜索胶卷型号</span>
+                <input
+                  id="stockSearch"
+                  type="search"
+                  placeholder="名称、边字或冲洗工艺"
+                  autocomplete="off"
+                  spellcheck="false"
+                  aria-controls="stockSelect"
+                  aria-describedby="stockSearchStatus"
+                />
+              </label>
+              <p id="stockSearchStatus" class="field-hint stock-search-status" aria-live="polite"></p>
+              <label class="field">
+                <span>胶卷型号</span>
+                <select id="stockSelect"></select>
+              </label>
+            </div>
+          </details>
+
+          <details class="step workflow-panel" id="stepFormat" open>
+            <summary>
+              <span class="step-no" aria-hidden="true">03</span>
+              <span class="step-title">画幅与排列</span>
+              <span class="chip" id="stepChipFormat">135 · 6 张/行</span>
+            </summary>
+            <div class="step-body">
+              <label class="field">
+                <span>画幅</span>
+                <select id="frameAspect">
+                  <option value="135" selected>135 全画幅 3:2</option>
+                  <option value="half">半格 3:4（每行 12 张）</option>
+                  <option value="66">6×6 方画幅 1:1</option>
+                  <option value="645">6×4.5 中画幅（竖幅）</option>
+                  <option value="67">6×7 中画幅</option>
+                  <option value="69">6×9 中画幅 84×56</option>
+                  <option value="wide">135 宽幅</option>
+                  <option value="xpan" hidden>XPan 135 宽幅 65×24（兼容）</option>
+                  <option value="135-69" hidden>135 宽幅 84×24（兼容）</option>
+                  <option value="612">6×12 宽幅中画幅</option>
+                  <option value="617">6×17 宽幅中画幅</option>
+                </select>
+              </label>
+              <label class="field" id="wideSpecField" hidden>
+                <span>宽幅规格</span>
+                <select id="wideSpecSelect">
+                  <option value="xpan">XPan 65×24mm（每行 3 张）</option>
+                  <option value="135-69">84×24mm（6×9 相机，每行 2 张）</option>
+                </select>
+              </label>
+              <div class="field" id="halfFrameModeField" hidden>
+                <span>半格输入</span>
+                <div class="segmented" role="radiogroup" aria-label="半格输入方式">
+                  <label>
+                    <input type="radio" name="halfFrameMode" value="cropped" checked />
+                    <span>单张裁切</span>
+                  </label>
+                  <label>
+                    <input type="radio" name="halfFrameMode" value="uncropped" />
+                    <span>单张未裁切</span>
+                  </label>
+                </div>
+              </div>
+              <label class="field">
+                <span>每行张数</span>
+                <select id="columnsSelect">
+                  <option value="2">2 张</option>
+                  <option value="3">3 张</option>
+                  <option value="4">4 张</option>
+                  <option value="5">5 张</option>
+                  <option value="6" selected>6 张</option>
+                  <option value="7">7 张</option>
+                  <option value="8">8 张</option>
+                </select>
+                <small id="columnsHint" class="field-hint" hidden></small>
+              </label>
+            </div>
+          </details>
+
+          <details class="step workflow-panel" id="stepLook" open>
+            <summary>
+              <span class="step-no" aria-hidden="true">04</span>
+              <span class="step-title">胶片外观</span>
+              <span class="chip" id="stepChipLook">—</span>
+            </summary>
+            <div class="step-body">
+              <label class="checkbox-row">
+                <input id="showEdgeText" type="checkbox" checked />
+                <span>模拟边字</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="showSprockets" type="checkbox" checked />
+                <span>模拟齿孔</span>
+              </label>
+              <small id="sprocketsHint" class="field-hint" hidden></small>
+              <label class="checkbox-row">
+                <input id="imageInSprockets" type="checkbox" />
+                <span>成像覆盖齿孔区</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="imageInEdgeText" type="checkbox" />
+                <span>成像覆盖边字区</span>
+              </label>
+              <small id="imageCoverageHint" class="field-hint" hidden></small>
+              <label class="checkbox-row">
+                <input id="showLeader" type="checkbox" checked />
+                <span>模拟片头片尾</span>
+              </label>
+              <small id="leaderHint" class="field-hint" hidden></small>
+              <label class="field background-style-field">
+                <span>背景样式</span>
+                <select id="backgroundStyle">
+                  <option value="none" selected>无（淡黄纸底）</option>
+                  <option value="white">纯白</option>
+                  <option value="transparent">透明（导出 PNG）</option>
+                  <option value="blur">高斯模糊</option>
+                </select>
+              </label>
+              <label class="checkbox-row">
+                <input id="showStripShadow" type="checkbox" checked />
+                <span>胶片条投影</span>
+              </label>
+              <label class="field background-blur-field" id="backgroundBlurField">
+                <span class="field-label-with-value">
+                  <span>虚化强度</span>
+                  <output id="backgroundBlurValue" for="backgroundBlur">24 px</output>
+                </span>
+                <input id="backgroundBlur" type="range" min="8" max="64" step="2" value="24" aria-describedby="backgroundHint" />
+              </label>
+              <small id="backgroundHint" class="field-hint">默认使用首图；点击单帧可将其设为背景</small>
+            </div>
+          </details>
+        </div>
+
+        <details class="step is-sub workflow-panel" id="stockPanel">
+          <summary>
+            <span class="step-title">自定义型号</span>
+            <span class="chip" id="stepChipStockLib">0 个自定义</span>
+          </summary>
+          <div class="step-body">
+            <p class="hint">
+              <span class="info-icon-wrapper">
+                <span class="info-icon" aria-label="说明">i</span>
+                <span class="info-popup">新增或编辑胶卷型号，保存在浏览器本地。选中内置型号时可另存为自定义型号后修改。</span>
+              </span>
+            </p>
+            <label class="field">
+              <span>名称</span>
+              <input id="stockName" type="text" placeholder="如 Kodak Vision3 250D" maxlength="60" />
             </label>
             <label class="field">
-              <span>交替边字字样（逗号分隔，留空随工艺）</span>
-              <input id="stockPresets" type="text" placeholder="如 135-36, C-41, SAFETY FILM" />
+              <span>边字字样（留空表示底片无边字）</span>
+              <input id="stockEdgeText" type="text" placeholder="如 KODAK VISION3 250D" maxlength="60" />
             </label>
             <label class="field">
-              <span>帧号格式</span>
-              <select id="stockFrameNumber">
-                <option value="">随工艺默认</option>
-                <option value="N/NA">N 与 NA 双号</option>
-                <option value="N">仅 N 单号</option>
+              <span>冲洗工艺</span>
+              <select id="stockProcess">
+                <option value="C-41" selected>C-41 彩色负片</option>
+                <option value="BW">黑白负片</option>
+                <option value="E-6">E-6 反转片</option>
+                <option value="ECN-2">ECN-2 电影卷</option>
               </select>
             </label>
-          </details>
-          <div class="stock-actions">
-            <button id="stockSaveButton" class="primary-button" type="button">保存为新型号</button>
-            <button id="stockDeleteButton" class="text-button" type="button" style="display: none">删除此型号</button>
-          </div>
-          <div class="stock-actions">
-            <button id="stockExportButton" class="text-button" type="button">导出 JSON</button>
-            <button id="stockImportButton" class="text-button" type="button">导入 JSON</button>
-            <input id="stockImportInput" type="file" accept="application/json,.json" hidden />
+            <details class="stock-advanced" id="stockAdvanced">
+              <summary>高级外观（默认随工艺）</summary>
+              <label class="checkbox-row">
+                <input id="stockInkEnabled" type="checkbox" />
+                <span>自定义边字颜色</span>
+              </label>
+              <label class="field stock-ink-field" id="stockInkField">
+                <span>边字颜色</span>
+                <input id="stockInkColor" type="color" value="#ffb040" />
+              </label>
+              <label class="field">
+                <span>交替边字字样（逗号分隔，留空随工艺）</span>
+                <input id="stockPresets" type="text" placeholder="如 135-36, C-41, SAFETY FILM" />
+              </label>
+              <label class="field">
+                <span>帧号格式</span>
+                <select id="stockFrameNumber">
+                  <option value="">随工艺默认</option>
+                  <option value="N/NA">N 与 NA 双号</option>
+                  <option value="N">仅 N 单号</option>
+                </select>
+              </label>
+            </details>
+            <div class="stock-actions">
+              <button id="stockSaveButton" class="primary-button" type="button">保存为新型号</button>
+              <button id="stockDeleteButton" class="text-button" type="button" style="display: none">删除此型号</button>
+            </div>
+            <div class="stock-actions">
+              <button id="stockExportButton" class="text-button" type="button">导出 JSON</button>
+              <button id="stockImportButton" class="text-button" type="button">导入 JSON</button>
+              <input id="stockImportInput" type="file" accept="application/json,.json" hidden />
+            </div>
           </div>
         </details>
 
-
-        <details class="panel advanced-panel" id="advancedPanel">
-          <summary><h2>高级设置</h2></summary>
-          <section class="panel-section" aria-label="尺寸设置">
-            <h3>尺寸设置</h3>
+        <details class="step is-sub workflow-panel" id="advancedPanel">
+          <summary>
+            <span class="step-title">高级设置</span>
+            <span class="chip" id="stepChipAdvanced">尺寸 420</span>
+          </summary>
+          <div class="step-body">
             <label class="field">
               <span>尺寸基准</span>
               <span class="info-icon-wrapper">
@@ -305,26 +334,30 @@
                 <span class="info-popup">135 以标准 36mm 画幅为基准，宽幅长边按物理比例增长</span>
               </span>
             </label>
-          </section>
-          <p class="hint">
-            <span class="info-icon-wrapper">
-              <span class="info-icon" aria-label="说明">i</span>
-              <span class="info-popup">微调齿孔与边字的渲染比例，实时作用于预览和导出。</span>
-            </span>
-          </p>
-          <div id="tuneFields"></div>
+            <p class="hint">
+              <span class="info-icon-wrapper">
+                <span class="info-icon" aria-label="说明">i</span>
+                <span class="info-popup">微调齿孔与边字的渲染比例，实时作用于预览和导出。</span>
+              </span>
+            </p>
+            <div id="tuneFields"></div>
+          </div>
         </details>
 
-        <details class="panel advanced-panel about-panel">
-          <summary><h2>关于</h2></summary>
-          <p class="about-text">
-            <strong>海带索引图 FILM</strong><br />
-            作者: Judian99<br />
-            小红书: 3661182800<br />
-            抖音: 69530829181<br />
-            邮箱: <a href="mailto:1946378724@qq.com">1946378724@qq.com</a>
-          </p>
-          <a href="https://github.com/Judian99/film-index-generator" target="_blank" rel="noopener" class="text-button">GitHub 项目主页</a>
+        <details class="step is-sub workflow-panel">
+          <summary>
+            <span class="step-title">关于</span>
+          </summary>
+          <div class="step-body">
+            <p class="about-text">
+              <strong>海带索引图 FILM</strong><br />
+              作者: Judian99<br />
+              小红书: 3661182800<br />
+              抖音: 69530829181<br />
+              邮箱: <a href="mailto:1946378724@qq.com">1946378724@qq.com</a>
+            </p>
+            <a href="https://github.com/Judian99/film-index-generator" target="_blank" rel="noopener" class="text-button">GitHub 项目主页</a>
+          </div>
         </details>
       </aside>
 
@@ -641,8 +674,8 @@
     <script src="film-frame.js?v=20260823-shared"></script>
     <script src="print-physical.js?v=20260923-print"></script>
     <script src="optical-loupe.js"></script>
-    <script src="app.js?v=20261011-edgenum"></script>
-    <script src="gsap-ui.js?v=20260823-cleanup"></script>
+    <script src="app.js?v=20261012e-sidebar"></script>
+    <script src="gsap-ui.js?v=20261012-sidebar"></script>
   </body>
 </html>
 

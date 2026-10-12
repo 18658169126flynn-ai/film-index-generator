@@ -20,6 +20,12 @@
   const statusTitle = document.getElementById("statusTitle");
   const imageCounter = document.getElementById("imageCounter");
   const exportButton = document.getElementById("exportButton");
+  const stepChipSource = document.getElementById("stepChipSource");
+  const stepChipStock = document.getElementById("stepChipStock");
+  const stepChipFormat = document.getElementById("stepChipFormat");
+  const stepChipLook = document.getElementById("stepChipLook");
+  const stepChipStockLib = document.getElementById("stepChipStockLib");
+  const stepChipAdvanced = document.getElementById("stepChipAdvanced");
   const reverseSort = document.getElementById("reverseSort");
   const sortSegmented = document.querySelector(".sort-segmented");
   const showEdgeText = document.getElementById("showEdgeText");
@@ -1915,6 +1921,20 @@ const loupeFrameTag = document.getElementById("loupeFrameTag");
 
   const FILM_135 = FilmFrame135.FILM_135;
 
+  // 步骤卡摘要里的画幅短名（getFormat().id 到两三个字的展示名）
+  const STEP_FORMAT_LABELS = {
+    "135": "135",
+    half: "半格",
+    "66": "6×6",
+    "645": "6×4.5",
+    "67": "6×7",
+    "69": "6×9",
+    "612": "6×12",
+    "617": "6×17",
+    xpan: "XPan",
+    "135-69": "84×24",
+  };
+
   const WIDE_135_SPECS = {
     xpan: FilmFrame.FORMATS.xpan,
     "135-69": FilmFrame.FORMATS["135-69"],
@@ -2036,6 +2056,7 @@ const loupeFrameTag = document.getElementById("loupeFrameTag");
 
   updateExportFormatControls();
   updateFrameModeControls();
+  updateStepChips();
   drawEmptyCanvas();
   applyPreviewZoom();
   syncLightTableControls();
@@ -2671,7 +2692,39 @@ const loupeFrameTag = document.getElementById("loupeFrameTag");
     state.renderTimer = window.setTimeout(render, 80);
   }
 
+  // 步骤卡摘要右侧的当前值：卡片收起后仍能读出这一步设了什么
+  function setStepChip(node, text, live) {
+    if (!node) return;
+    if (node.textContent !== text) node.textContent = text;
+    node.classList.toggle("is-live", Boolean(live));
+  }
+
+  function updateStepChips() {
+    const itemCount = state.items.length;
+    setStepChip(stepChipSource, itemCount ? `${itemCount} 张` : "未导入", itemCount > 0);
+
+    const process = getActiveStock().process;
+    setStepChip(stepChipStock, process || "—", Boolean(process));
+
+    const format = getFormat();
+    const columns = Number(columnsSelect.value) || 6;
+    setStepChip(stepChipFormat, `${STEP_FORMAT_LABELS[format.id] || format.id} · ${columns} 张/行`, true);
+
+    const lookCount = [
+      showEdgeText,
+      showSprockets,
+      showLeader,
+      showStripShadow,
+      imageInSprockets,
+      imageInEdgeText,
+    ].filter((control) => control.checked).length;
+    setStepChip(stepChipLook, `${lookCount} 项开启`, lookCount > 0);
+
+    setStepChip(stepChipStockLib, `${state.customStocks.length} 个自定义`, state.customStocks.length > 0);
+    setStepChip(stepChipAdvanced, `尺寸 ${frameWidthInput.value}`, true);
+  }
   function render() {
+    updateStepChips();
     if (!state.items.length) {
       drawEmptyCanvas();
       return;
@@ -5739,7 +5792,8 @@ html, body { margin: 0; padding: 0; background: #ffffff; }
     stockSelect.value = activeStock.id;
     stockSearchStatus.classList.toggle("is-empty", Boolean(query) && matchedCount === 0);
     if (!query) {
-      stockSearchStatus.textContent = `显示全部 ${getAllStocks().length} 个型号`;
+      // 未搜索时不占用版面，也不显示型号总数
+      stockSearchStatus.textContent = "";
     } else if (matchedCount === 0) {
       stockSearchStatus.textContent = "未找到匹配型号，已保留当前选择";
     } else {
@@ -5747,6 +5801,9 @@ html, body { margin: 0; padding: 0; background: #ffffff; }
         ? `找到 ${matchedCount} 个型号`
         : `找到 ${matchedCount} 个型号，已保留当前选择`;
     }
+    // 空状态整行收起，避免在字段之间留出多余间距
+    stockSearchStatus.hidden = !stockSearchStatus.textContent;
+    updateStepChips();
   }
 
   function stockOption(stock) {

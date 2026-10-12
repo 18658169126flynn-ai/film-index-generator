@@ -95,7 +95,7 @@
 
   function initPanelMotion() {
     document
-      .querySelectorAll('details.advanced-panel, details.photo-list-section, details.stock-advanced')
+      .querySelectorAll('details.advanced-panel, details.photo-list-section, details.stock-advanced, details.step')
       .forEach(function (panel) {
         var summary = panel.querySelector('summary');
         if (!summary) return;
@@ -134,7 +134,7 @@
                 onComplete: function () {
                   panel.style.height = '';
                   panel.style.overflow = '';
-                  var items = panel.querySelectorAll('.panel-section, .drop-zone, .field, .hint');
+                  var items = panel.querySelectorAll('.panel-section, .step-body > *, .drop-zone, .field, .hint');
                   if (items.length) {
                     gsap.from(items, {
                       y: 10,
